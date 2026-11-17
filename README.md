@@ -4,7 +4,7 @@ Concepto de tienda con una dirección visual propia en violeta, fotografía de p
 
 ## Vista local
 
-Con Node.js 20 o posterior, ejecutá `node server.mjs` y abrí `http://127.0.0.1:4173`. El servidor local usa los módulos nativos de Node.js. El sitio también se puede servir estáticamente desde la raíz del repositorio.
+Con la carpeta completa del repositorio, abrí `index.html` en el navegador. También podés ejecutar `node server.mjs` con Node.js 20 o posterior y abrir `http://127.0.0.1:4173`. El sitio se puede servir estáticamente desde la raíz del repositorio.
 
 ## Recorrido de muestra
 
@@ -12,7 +12,7 @@ Desde la portada, entrá a Audio, abrí la ficha de los auriculares y agregalos 
 
 ## Coreografía de la tienda
 
-- La portada adapta el barrido de luz de [AFTER HOURS](https://thepromptsfactory.com/assets/video-previews/after-hours-light.mp4?capture=1). La luz se asienta tras la entrada y responde al puntero sobre la escena. La foto abre la ficha de los auriculares.
+- La portada adapta el barrido de luz de [AFTER HOURS](https://thepromptsfactory.com/assets/video-previews/after-hours-light.mp4?capture=1). Un haz abre la fotografía mientras dos trazos recorren el auricular. Podés repetir la escena desde la portada. En movimiento reducido solo se ilumina el haz cuando activás el control. La foto abre la ficha de los auriculares.
 - «Elegí tu momento» traduce la profundidad de [STRATA](https://thepromptsfactory.com/assets/video-previews/extrafazant-strata.mp4?capture=1) a tres escenas que se exploran con botones, teclado o deslizamiento táctil. El cambio de plano también actualiza el texto y el color de la luz.
 - La transición a la ficha conserva la foto de la escena tomando como referencia [SORA](https://thepromptsfactory.com/assets/video-previews/sora-shrink.mp4). Usa View Transitions cuando está disponible. El carrito retoma el arco violeta y las acciones de compra. Con movimiento reducido, la foto, la selección y las acciones conservan su estado estático.
 

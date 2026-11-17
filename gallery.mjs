@@ -1,3 +1,4 @@
+(function registerGallery() {
 const scenes = [
   {
     id: 'audio', label: 'Audio', product: 'auriculares', name: 'Auriculares Pulse ANC',
@@ -16,7 +17,7 @@ const scenes = [
   },
 ];
 
-export function mountGallery() {
+function mountGallery() {
   const gallery = document.querySelector('#experiencia');
   if (!gallery) return;
 
@@ -112,3 +113,6 @@ export function mountGallery() {
     swipedCard = undefined;
   }, { capture: true });
 }
+
+(window.Fravega ??= {}).mountGallery = mountGallery;
+})();

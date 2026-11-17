@@ -1,3 +1,4 @@
+(function registerShop() {
 const categories = {
   all: 'Todo',
   audio: 'Audio',
@@ -87,7 +88,7 @@ function purchaseSteps(current) {
     `<li${index === current ? ' aria-current="step"' : ''}>${label}</li>`).join('')}</ol>`;
 }
 
-export function mountShop() {
+function mountShop() {
   const catalog = document.querySelector('#catalog');
   const dialog = document.querySelector('#app-dialog');
   const search = document.querySelector('#site-search');
@@ -158,6 +159,7 @@ export function mountShop() {
   }
 
   function visitCatalog() {
+    if (location.hash !== '#catalog') history.pushState(null, '', '#catalog');
     heading.focus({ preventScroll: true });
     catalog.scrollIntoView();
   }
@@ -412,6 +414,7 @@ export function mountShop() {
       return;
     }
     if (Object.hasOwn(categories, control.dataset.category)) {
+      if (control.matches('a') && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)) return;
       event.preventDefault();
       category = control.dataset.category;
       if (!filters.contains(control)) {
@@ -504,3 +507,6 @@ export function mountShop() {
   renderCatalog();
   updateCart();
 }
+
+(window.Fravega ??= {}).mountShop = mountShop;
+})();

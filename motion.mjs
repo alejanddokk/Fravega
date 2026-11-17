@@ -1,8 +1,28 @@
-export function mountMotion() {
+(function registerMotion() {
+function mountMotion() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const precisePointer = matchMedia('(hover: hover) and (pointer: fine)');
   const hero = document.querySelector('[data-hero]');
   const targets = document.querySelectorAll('[data-reveal], [data-stagger]');
+  const replay = hero.querySelector('[data-replay-hero]');
+
+  function playHero() {
+    if (hero.classList.contains('is-playing')) {
+      hero.classList.remove('is-playing');
+      // Commit the rest pose before restarting an interrupted replay.
+      void hero.offsetWidth;
+    }
+    hero.classList.add('is-playing');
+  }
+
+  replay.hidden = false;
+  replay.addEventListener('click', playHero);
+  hero.addEventListener('animationend', (event) => {
+    if (['hero-orbit-fade', 'hero-replay-quiet'].includes(event.animationName)) {
+      hero.classList.remove('is-playing');
+    }
+  });
+  if (!reduced.matches && window.scrollY < hero.offsetTop + hero.offsetHeight) playHero();
 
   // Adopt the kit's first-sample behavior so already-visible content starts in place.
   if ('IntersectionObserver' in window && !reduced.matches) {
@@ -54,5 +74,9 @@ export function mountMotion() {
   hero.addEventListener('pointerleave', clearDepth);
   hero.addEventListener('pointercancel', clearDepth);
   reduced.addEventListener('change', clearDepth);
+  reduced.addEventListener('change', () => hero.classList.remove('is-playing'));
   precisePointer.addEventListener('change', clearDepth);
 }
+
+(window.Fravega ??= {}).mountMotion = mountMotion;
+})();

@@ -1,7 +1,4 @@
-import { mountShop } from './shop.mjs';
-import { mountMotion } from './motion.mjs';
-import { mountGallery } from './gallery.mjs';
-
-mountShop();
-mountGallery();
-mountMotion();
+// Each classic deferred script exposes one initializer, including when opened via file://.
+window.Fravega?.mountShop?.();
+window.Fravega?.mountGallery?.();
+window.Fravega?.mountMotion?.();
