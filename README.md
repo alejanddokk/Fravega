@@ -16,6 +16,7 @@ Desde la portada, entrá a Audio, abrí la ficha de los auriculares y agregalos 
 - «Elegí tu momento» traduce la profundidad de [STRATA](https://thepromptsfactory.com/assets/video-previews/extrafazant-strata.mp4?capture=1) a tres escenas que se exploran con botones, teclado o deslizamiento táctil. El cambio de plano también actualiza el texto y el color de la luz.
 - La transición a la ficha conserva la foto de la escena tomando como referencia [SORA](https://thepromptsfactory.com/assets/video-previews/sora-shrink.mp4). Usa View Transitions cuando está disponible. El carrito retoma el arco violeta y las acciones de compra. Con movimiento reducido, la foto, la selección y las acciones conservan su estado estático.
 - El catálogo adapta las trayectorias de [FIELD NOTES](https://thepromptsfactory.com/assets/video-previews/field-notes-flight.mp4). Las tarjetas convergen en la grilla siguiendo el scroll y vuelven a separarse al subir. Al ordenar por precio, cada tarjeta conserva su identidad y viaja hasta su nuevo lugar, siguiendo la idea de [Editions](https://thepromptsfactory.com/assets/video-previews/shuffle-sort.mp4?v=3). El orden de lectura se actualiza en el momento. Con movimiento reducido, la grilla se actualiza directamente.
+- El fondo del catálogo retoma los arcos de luz de la portada y la galería. El resplandor y los arcos se desplazan a distintas velocidades con el scroll. En movimiento reducido, las capas quedan fijas.
 
 ## Fotografía
 
