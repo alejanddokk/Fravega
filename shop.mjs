@@ -102,6 +102,9 @@ export function mountShop() {
   let category = 'all';
   let query = '';
   let dialogOrigin;
+  let featuredTransition;
+  let markedPhoto;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
   catalog.innerHTML = `<div class="shop-wrap">
     <header class="shop-heading" data-reveal>
@@ -163,7 +166,7 @@ export function mountShop() {
     const count = Object.values(state.cart).reduce((sum, quantity) => sum + quantity, 0);
     if (cartCount && cartCount.textContent !== String(count)) {
       cartCount.textContent = String(count);
-      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (!reducedMotion.matches) {
         cartCount.getAnimations().forEach(animation => animation.cancel());
         cartCount.animate([{ scale: 1 }, { scale: 1.2, offset: .4 }, { scale: 1 }], 250);
       }
@@ -180,6 +183,7 @@ export function mountShop() {
   }
 
   function showPanel(title, contents, className = '', focus = true) {
+    if (className) featuredTransition?.skipTransition();
     const wasOpen = dialog.open;
     if (!wasOpen) dialogOrigin = document.activeElement;
     const isCart = className === 'cart';
@@ -198,9 +202,9 @@ export function mountShop() {
     if (focus || !wasOpen) dialog.querySelector('#shop-panel-title').focus({ preventScroll: true });
   }
 
-  function showProduct(product) {
+  function showProduct(product, sourceImage, trigger) {
     showPanel(product.name, `<div class="shop-detail">
-      ${productImage(product)}
+      ${sourceImage ? '<div class="shop-campaign-photo"></div>' : productImage(product)}
       <div>
         <p class="shop-category-label">${categories[product.category]}</p>
         <p>${product.description}</p>
@@ -210,6 +214,65 @@ export function mountShop() {
         <p class="shop-demo-note">Producto y precio ilustrativos.</p>
       </div>
     </div>`);
+    if (trigger) dialogOrigin = trigger;
+    if (!sourceImage) return null;
+
+    const photo = document.createElement('img');
+    photo.src = sourceImage.currentSrc || sourceImage.src;
+    photo.alt = product.name;
+    const frame = dialog.querySelector('.shop-campaign-photo');
+    frame.append(photo);
+    return photo;
+  }
+
+  function featuredPhoto(trigger) {
+    if (trigger?.dataset.featuredOrigin === 'hero') return document.querySelector('.hero-art img');
+    return trigger?.querySelector('img');
+  }
+
+  function swapFeaturedPhoto(source, update) {
+    featuredTransition?.skipTransition();
+    if (reducedMotion.matches || !document.startViewTransition || !source?.naturalWidth) {
+      update();
+      return;
+    }
+
+    const root = document.documentElement;
+    root.classList.add('has-featured-transition');
+    markedPhoto?.classList.remove('is-featured-frame');
+    source.classList.add('is-featured-frame');
+    markedPhoto = source;
+
+    // Adapt the skill kit's shared scene transition to the shop's native dialog.
+    const transition = document.startViewTransition(() => {
+      if (featuredTransition !== transition) return;
+      source.classList.remove('is-featured-frame');
+      markedPhoto = update();
+      markedPhoto?.classList.add('is-featured-frame');
+    });
+    featuredTransition = transition;
+    transition.ready.catch(() => {});
+    const settle = () => {
+      if (featuredTransition !== transition) return;
+      markedPhoto?.classList.remove('is-featured-frame');
+      root.classList.remove('has-featured-transition');
+      markedPhoto = undefined;
+      featuredTransition = undefined;
+    };
+    transition.finished.then(settle, settle);
+  }
+
+  function dismissDialog() {
+    const source = dialog.querySelector('.shop-campaign-photo img');
+    const destination = featuredPhoto(dialogOrigin);
+    if (!source || !destination?.isConnected) {
+      dialog.close();
+      return;
+    }
+    swapFeaturedPhoto(source, () => {
+      dialog.close();
+      return destination;
+    });
   }
 
   function showCart(focus = true) {
@@ -340,8 +403,14 @@ export function mountShop() {
   ]);
 
   document.addEventListener('click', event => {
-    const control = event.target.closest('[data-category], [data-open], [data-shop-action]');
+    const control = event.target.closest('[data-category], [data-open], [data-shop-action], [data-featured-product]');
     if (!control) return;
+    if (control.dataset.featuredProduct) {
+      const product = products.find(item => item.id === control.dataset.featuredProduct);
+      const source = featuredPhoto(control);
+      if (product) swapFeaturedPhoto(source, () => showProduct(product, source, control));
+      return;
+    }
     if (Object.hasOwn(categories, control.dataset.category)) {
       event.preventDefault();
       category = control.dataset.category;
@@ -366,7 +435,7 @@ export function mountShop() {
     if (action === 'product' && product) showProduct(product);
     if (['add', 'plus', 'minus', 'remove'].includes(action) && product) changeQuantity(action, product);
     if (action === 'checkout') showCheckout();
-    if (action === 'close') dialog.close();
+    if (action === 'close') dismissDialog();
     if (action === 'browse') {
       dialog.close();
       dialogOrigin = null;
@@ -390,9 +459,17 @@ export function mountShop() {
   });
   sort.addEventListener('change', renderCatalog);
 
+  dialog.addEventListener('cancel', event => {
+    if (!dialog.querySelector('.shop-campaign-photo')) return;
+    event.preventDefault();
+    dismissDialog();
+  });
   dialog.addEventListener('close', () => {
     if (dialogOrigin?.isConnected) dialogOrigin.focus({ preventScroll: true });
     dialogOrigin = null;
+  });
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) featuredTransition?.skipTransition();
   });
   dialog.addEventListener('change', event => {
     const form = event.target.closest('[data-shop-form="checkout"]');

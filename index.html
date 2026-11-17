@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=DM+Sans:wght@400..700&display=swap">
   <link rel="preload" as="image" href="assets/hero.jpg">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="gallery.css">
   <link rel="stylesheet" href="shop.css">
   <script type="module" src="main.mjs"></script>
 </head>
@@ -55,19 +56,23 @@
     <section class="hero wrap" aria-labelledby="hero-title" data-hero>
       <div class="hero-art" aria-hidden="true"><img src="assets/hero.jpg" width="1536" height="1024" alt="" fetchpriority="high"></div>
       <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-beam" aria-hidden="true"></div>
       <div class="hero-content">
         <div class="hero-label"><span aria-hidden="true"></span> TECNOLOGÍA PARA TODOS LOS DÍAS</div>
         <h1 id="hero-title"><span class="hero-line"><span>Encendé</span></span><span class="hero-line"><span>tu mundo<span class="hero-dot">.</span></span></h1>
         <p>Subí el volumen, elegí tu próxima pantalla o renová tu casa a tu manera.</p>
         <div class="hero-actions">
           <button class="hero-primary" type="button" data-category="audio">Explorar audio <span aria-hidden="true">↗</span></button>
-          <button class="hero-secondary" type="button" data-category="all">Ver catálogo <span aria-hidden="true">↓</span></button>
+          <a class="hero-secondary" href="#experiencia">Ver la selección <span aria-hidden="true">↓</span></a>
         </div>
       </div>
-      <div class="hero-caption">
-        <span class="sound-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-        <div><strong>Audio inalámbrico</strong><small>Sonido que va con vos</small></div>
-      </div>
+      <button class="hero-art-hit" type="button" data-featured-product="auriculares" data-featured-origin="hero" aria-label="Ver ficha de Auriculares Pulse ANC">
+        <span class="hero-caption">
+          <span class="sound-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          <span><strong>Pulse ANC</strong><small>Explorá los auriculares</small></span>
+          <span class="hero-caption-arrow" aria-hidden="true">↗</span>
+        </span>
+      </button>
     </section>
 
     <section class="wrap departments" aria-labelledby="department-title">
@@ -80,6 +85,8 @@
         <button class="department-tile tile-home" type="button" data-category="hogar"><span>Hogar <small aria-hidden="true">↗</small></span><i aria-hidden="true"></i></button>
       </div>
     </section>
+
+    <section class="gallery" id="experiencia" aria-labelledby="gallery-title"></section>
 
     <section class="catalog" id="catalog" aria-label="Catálogo"></section>
 

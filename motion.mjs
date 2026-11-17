@@ -33,6 +33,8 @@ export function mountMotion() {
     frame = 0;
     hero.style.removeProperty('--hero-x');
     hero.style.removeProperty('--hero-y');
+    hero.style.removeProperty('--hero-light-x');
+    hero.style.removeProperty('--hero-light-y');
   }
 
   hero.addEventListener('pointermove', (event) => {
@@ -40,8 +42,12 @@ export function mountMotion() {
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(() => {
       const box = hero.getBoundingClientRect();
-      hero.style.setProperty('--hero-x', `${((event.clientX - box.left) / box.width - .5) * 18}px`);
-      hero.style.setProperty('--hero-y', `${((event.clientY - box.top) / box.height - .5) * 12}px`);
+      const x = (event.clientX - box.left) / box.width - .5;
+      const y = (event.clientY - box.top) / box.height - .5;
+      hero.style.setProperty('--hero-x', `${x * 18}px`);
+      hero.style.setProperty('--hero-y', `${y * 12}px`);
+      hero.style.setProperty('--hero-light-x', `${x * 175}px`);
+      hero.style.setProperty('--hero-light-y', `${y * 145}px`);
       frame = 0;
     });
   }, { passive: true });

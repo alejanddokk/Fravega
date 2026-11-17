@@ -9,9 +9,13 @@ const publicFiles = new Map([
   ['/main.mjs', ['main.mjs', 'text/javascript; charset=utf-8']],
   ['/shop.mjs', ['shop.mjs', 'text/javascript; charset=utf-8']],
   ['/motion.mjs', ['motion.mjs', 'text/javascript; charset=utf-8']],
+  ['/gallery.css', ['gallery.css', 'text/css; charset=utf-8']],
+  ['/gallery.mjs', ['gallery.mjs', 'text/javascript; charset=utf-8']],
   ['/assets/hero.jpg', ['assets/hero.jpg', 'image/jpeg']],
   ['/assets/products.jpg', ['assets/products.jpg', 'image/jpeg']],
   ['/assets/favicon.png', ['assets/favicon.png', 'image/png']],
+  ['/assets/scene-tv.jpg', ['assets/scene-tv.jpg', 'image/jpeg']],
+  ['/assets/scene-kitchen.jpg', ['assets/scene-kitchen.jpg', 'image/jpeg']],
 ]);
 
 const host = '127.0.0.1';
