@@ -1,7 +1,6 @@
 .gallery {
   --gallery-light: #6330a0;
   --gallery-rim: #c48bff;
-  --gallery-ease: cubic-bezier(.2, .72, .22, 1);
   position: relative;
   isolation: isolate;
   overflow: clip;
@@ -180,13 +179,14 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .gallery::before { transition: background-color .54s var(--gallery-ease); }
-  .gallery-card { transition: transform .64s var(--gallery-ease), opacity .34s ease, border-color .24s ease; }
-  .gallery-card img, .gallery-card-open > span { transition: transform .48s var(--gallery-ease); }
+  .gallery::before { transition: background-color var(--motion-shared) var(--motion-ease); }
+  .gallery-card { transition: transform var(--motion-scene) var(--motion-ease), opacity var(--motion-panel), border-color var(--motion-quick); }
+  .gallery-card img { transition: transform var(--motion-shared) var(--motion-ease); }
+  .gallery-card-open > span { transition: transform var(--motion-quick) var(--motion-ease); }
   .gallery-card[data-depth='0']:is(:hover, :focus-visible) img { transform: scale(1.045); }
   .gallery-card[data-depth='0']:is(:hover, :focus-visible) .gallery-card-open > span { transform: translate(.13em, -.13em); }
-  .gallery-controls button { transition: color .22s ease, background-color .22s ease, border-color .22s ease; }
-  .gallery-description > div { animation: gallery-copy .36s var(--gallery-ease) both; }
+  .gallery-controls button { transition: color var(--motion-quick), background-color var(--motion-quick), border-color var(--motion-quick); }
+  .gallery-description > div { animation: gallery-copy var(--motion-panel) var(--motion-ease) both; }
 }
 
 @keyframes gallery-copy {

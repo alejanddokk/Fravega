@@ -103,9 +103,12 @@ function mountShop() {
   let category = 'all';
   let query = '';
   let dialogOrigin;
-  let featuredTransition;
+  let productTransition;
   let markedPhoto;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const timing = getComputedStyle(document.documentElement);
+  const sceneDuration = Number.parseFloat(timing.getPropertyValue('--motion-scene')) || 640;
+  const motionEase = timing.getPropertyValue('--motion-ease').trim() || 'ease-out';
 
   catalog.innerHTML = `<div class="shop-wrap">
     <header class="shop-heading" data-reveal>
@@ -121,7 +124,7 @@ function mountShop() {
         </select>
       </label>
     </header>
-    <div class="shop-filters" role="group" aria-label="Filtrar el catálogo" data-reveal>
+    <div class="shop-filters" data-motion-selection role="group" aria-label="Filtrar el catálogo" data-reveal>
       ${Object.entries(categories).map(([id, name]) => `<button type="button" data-category="${id}" aria-pressed="${id === 'all'}">${name}</button>`).join('')}
     </div>
     <p class="shop-results" role="status"></p>
@@ -177,7 +180,7 @@ function mountShop() {
         { transform: `translate(${x}px, ${y}px)` },
         { transform: `translate(${x * .32}px, ${y * .32 - 20}px)`, offset: .6 },
         { transform: 'none' },
-      ], { duration: 650, easing: 'cubic-bezier(.21,.72,.29,1)' });
+      ], { duration: sceneDuration, easing: motionEase });
       cardMoves.set(slot, animation);
       const settle = () => {
         if (cardMoves.get(slot) === animation) cardMoves.delete(slot);
@@ -226,7 +229,10 @@ function mountShop() {
       cartCount.textContent = String(count);
       if (!reducedMotion.matches) {
         cartCount.getAnimations().forEach(animation => animation.cancel());
-        cartCount.animate([{ scale: 1 }, { scale: 1.2, offset: .4 }, { scale: 1 }], 250);
+        cartCount.animate([{ scale: 1 }, { scale: 1.15, offset: .4 }, { scale: 1 }], {
+          duration: Number.parseFloat(timing.getPropertyValue('--motion-quick')) || 180,
+          easing: motionEase,
+        });
       }
     }
     try {
@@ -241,7 +247,7 @@ function mountShop() {
   }
 
   function showPanel(title, contents, className = '', focus = true) {
-    if (className) featuredTransition?.skipTransition();
+    if (className) productTransition?.skipTransition();
     const wasOpen = dialog.open;
     if (!wasOpen) dialogOrigin = document.activeElement;
     const isCart = className === 'cart';
@@ -273,7 +279,7 @@ function mountShop() {
       </div>
     </div>`);
     if (trigger) dialogOrigin = trigger;
-    if (!sourceImage) return null;
+    if (!sourceImage) return dialog.querySelector('.shop-detail .shop-product-image');
 
     const photo = document.createElement('img');
     photo.src = sourceImage.currentSrc || sourceImage.src;
@@ -283,51 +289,52 @@ function mountShop() {
     return photo;
   }
 
-  function featuredPhoto(trigger) {
+  function productPhoto(trigger) {
     if (trigger?.dataset.featuredOrigin === 'hero') return document.querySelector('.hero-art img');
-    return trigger?.querySelector('img');
+    return trigger?.querySelector('img') ?? trigger?.closest('.shop-card')?.querySelector('.shop-product-image');
   }
 
-  function swapFeaturedPhoto(source, update) {
-    featuredTransition?.skipTransition();
-    if (reducedMotion.matches || !document.startViewTransition || !source?.naturalWidth) {
+  function swapProductPhoto(source, update) {
+    productTransition?.skipTransition();
+    if (reducedMotion.matches || !document.startViewTransition || !source ||
+      (source instanceof HTMLImageElement && !source.naturalWidth)) {
       update();
       return;
     }
 
     const root = document.documentElement;
-    root.classList.add('has-featured-transition');
-    markedPhoto?.classList.remove('is-featured-frame');
-    source.classList.add('is-featured-frame');
+    root.classList.add('has-product-transition');
+    markedPhoto?.classList.remove('is-product-frame');
+    source.classList.add('is-product-frame');
     markedPhoto = source;
 
     // Adapt the skill kit's shared scene transition to the shop's native dialog.
     const transition = document.startViewTransition(() => {
-      if (featuredTransition !== transition) return;
-      source.classList.remove('is-featured-frame');
+      if (productTransition !== transition) return;
+      source.classList.remove('is-product-frame');
       markedPhoto = update();
-      markedPhoto?.classList.add('is-featured-frame');
+      markedPhoto?.classList.add('is-product-frame');
     });
-    featuredTransition = transition;
+    productTransition = transition;
     transition.ready.catch(() => {});
     const settle = () => {
-      if (featuredTransition !== transition) return;
-      markedPhoto?.classList.remove('is-featured-frame');
-      root.classList.remove('has-featured-transition');
+      if (productTransition !== transition) return;
+      markedPhoto?.classList.remove('is-product-frame');
+      root.classList.remove('has-product-transition');
       markedPhoto = undefined;
-      featuredTransition = undefined;
+      productTransition = undefined;
     };
     transition.finished.then(settle, settle);
   }
 
   function dismissDialog() {
-    const source = dialog.querySelector('.shop-campaign-photo img');
-    const destination = featuredPhoto(dialogOrigin);
+    const source = dialog.querySelector('.shop-campaign-photo img, .shop-detail .shop-product-image');
+    const destination = productPhoto(dialogOrigin);
     if (!source || !destination?.isConnected) {
       dialog.close();
       return;
     }
-    swapFeaturedPhoto(source, () => {
+    swapProductPhoto(source, () => {
       dialog.close();
       return destination;
     });
@@ -465,8 +472,8 @@ function mountShop() {
     if (!control) return;
     if (control.dataset.featuredProduct) {
       const product = products.find(item => item.id === control.dataset.featuredProduct);
-      const source = featuredPhoto(control);
-      if (product) swapFeaturedPhoto(source, () => showProduct(product, source, control));
+      const source = productPhoto(control);
+      if (product) swapProductPhoto(source, () => showProduct(product, source, control));
       return;
     }
     if (Object.hasOwn(categories, control.dataset.category)) {
@@ -491,7 +498,7 @@ function mountShop() {
       return;
     }
     const product = products.find(item => item.id === control.dataset.product);
-    if (action === 'product' && product) showProduct(product);
+    if (action === 'product' && product) swapProductPhoto(productPhoto(control), () => showProduct(product, null, control));
     if (['add', 'plus', 'minus', 'remove'].includes(action) && product) changeQuantity(action, product);
     if (action === 'checkout') showCheckout();
     if (action === 'close') dismissDialog();
@@ -519,7 +526,7 @@ function mountShop() {
   sort.addEventListener('change', renderCatalog);
 
   dialog.addEventListener('cancel', event => {
-    if (!dialog.querySelector('.shop-campaign-photo')) return;
+    if (!dialog.querySelector('.shop-detail')) return;
     event.preventDefault();
     dismissDialog();
   });
@@ -529,7 +536,7 @@ function mountShop() {
   });
   reducedMotion.addEventListener('change', () => {
     if (reducedMotion.matches) {
-      featuredTransition?.skipTransition();
+      productTransition?.skipTransition();
       stopCardMoves();
     }
   });

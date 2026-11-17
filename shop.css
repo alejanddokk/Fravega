@@ -138,7 +138,7 @@
   font-size: .9rem;
   font-weight: 650;
   cursor: pointer;
-  transition: color .18s ease, border-color .18s ease, background-color .18s ease;
+  transition: color var(--motion-quick), border-color var(--motion-quick), background-color var(--motion-quick);
 }
 
 .shop-filters button[aria-pressed="true"],
@@ -172,7 +172,7 @@
   border: 1px solid var(--store-edge);
   border-radius: 1rem;
   background: linear-gradient(145deg, #332448, #23192f);
-  transition: box-shadow .3s ease, border-color .3s ease;
+  transition: box-shadow var(--motion-panel), border-color var(--motion-quick);
 }
 
 @supports ((animation-timeline: view()) and (animation-range: entry)) {
@@ -182,7 +182,7 @@
     .shop-slot:nth-child(3n + 2) { --arrival-x: 0%; --arrival-y: 30%; --arrival-angle: 5deg; }
     .shop-slot:nth-child(3n) { --arrival-x: 31%; --arrival-y: 8%; --arrival-angle: 13deg; }
     .shop-slot > .shop-card {
-      animation: shop-card-arrival auto cubic-bezier(.38,.04,.28,1) both;
+      animation: shop-card-arrival auto var(--motion-scroll) both;
       animation-timeline: --product-arrival;
       animation-range: entry 5% cover 44%;
     }
@@ -237,7 +237,7 @@
   top: 50%;
   left: 0;
   transform: translateY(-50%);
-  transition: scale .55s cubic-bezier(.2,.75,.25,1);
+  transition: scale var(--motion-shared) var(--motion-ease);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -366,7 +366,7 @@
 .shop-primary {
   background: var(--purple, #7027d9);
   color: #fff;
-  transition: background-color .18s ease, transform .18s ease;
+  transition: background-color var(--motion-quick), transform var(--motion-quick) var(--motion-ease);
 }
 
 .shop-add:hover,
@@ -427,7 +427,7 @@ body:has(.shop-dialog[open]) {
 }
 
 .shop-dialog[open] {
-  animation: shop-modal-in .28s cubic-bezier(.22,.7,.28,1) both;
+  animation: shop-modal-in var(--motion-panel) var(--motion-ease) both;
 }
 
 .shop-dialog::backdrop {
@@ -435,7 +435,7 @@ body:has(.shop-dialog[open]) {
 }
 
 .shop-dialog[open]::backdrop {
-  animation: shop-backdrop-in .25s ease both;
+  animation: shop-backdrop-in var(--motion-panel) var(--motion-ease) both;
 }
 
 .shop-dialog.shop-drawer {
@@ -534,19 +534,19 @@ body:has(.shop-dialog[open]) {
 }
 .shop-campaign-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 65% 50%; }
 
-.has-featured-transition { view-transition-name: none; }
-.has-featured-transition .is-featured-frame { view-transition-name: featured-photo; }
-.has-featured-transition .shop-dialog[open]:has(.shop-campaign-photo) { animation: none; view-transition-name: featured-panel; }
-.has-featured-transition::view-transition { pointer-events: none; }
-.has-featured-transition::view-transition-group(featured-panel) { z-index: 1; animation-duration: 340ms; }
-.has-featured-transition::view-transition-new(featured-panel) { animation: featured-panel-in 340ms ease-out both; }
-.has-featured-transition::view-transition-old(featured-panel) { animation: featured-panel-out 290ms ease-in both; }
-.has-featured-transition::view-transition-group(featured-photo) { z-index: 2; animation-duration: 480ms; animation-timing-function: var(--settle); }
-.has-featured-transition::view-transition-image-pair(featured-photo) { overflow: clip; border-radius: .7rem; }
-.has-featured-transition::view-transition-old(featured-photo),
-.has-featured-transition::view-transition-new(featured-photo) { height: 100%; object-fit: cover; }
-@keyframes featured-panel-in { from { opacity: .16; } to { opacity: 1; } }
-@keyframes featured-panel-out { from { opacity: 1; } to { opacity: 0; } }
+.has-product-transition { view-transition-name: none; }
+.has-product-transition .is-product-frame { view-transition-name: product-photo; }
+.has-product-transition .shop-dialog[open]:has(.shop-detail) { animation: none; view-transition-name: product-panel; }
+.has-product-transition::view-transition { pointer-events: none; }
+.has-product-transition::view-transition-group(product-panel) { z-index: 1; animation-duration: var(--motion-panel); }
+.has-product-transition::view-transition-new(product-panel) { animation: product-panel-in var(--motion-panel) var(--motion-ease) both; }
+.has-product-transition::view-transition-old(product-panel) { animation: product-panel-out var(--motion-quick) ease-in both; }
+.has-product-transition::view-transition-group(product-photo) { z-index: 2; animation-duration: var(--motion-shared); animation-timing-function: var(--motion-ease); }
+.has-product-transition::view-transition-image-pair(product-photo) { overflow: clip; border-radius: .7rem; }
+.has-product-transition::view-transition-old(product-photo),
+.has-product-transition::view-transition-new(product-photo) { height: 100%; object-fit: cover; }
+@keyframes product-panel-in { from { opacity: .16; } to { opacity: 1; } }
+@keyframes product-panel-out { from { opacity: 1; } to { opacity: 0; } }
 
 .shop-detail .shop-product-image,
 .shop-cart-item .shop-product-image {
@@ -696,13 +696,13 @@ body:has(.shop-dialog[open]) {
 .shop-empty-mark > span { position: absolute; top: 5px; right: 9px; font-weight: 700; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .shop-cart-enter .shop-cart-stage::before { animation: cart-arc 720ms cubic-bezier(.2,.7,.2,1) both; }
+  .shop-cart-enter .shop-cart-stage::before { animation: cart-arc var(--motion-scene) var(--motion-ease) both; }
   .shop-cart-enter .shop-cart-meter,
   .shop-cart-enter .shop-cart-item,
   .shop-cart-enter .shop-cart-empty,
-  .shop-cart-enter .shop-summary { animation: shop-product-in 360ms cubic-bezier(.2,.75,.25,1) backwards; }
-  .shop-cart-enter .shop-cart-item:nth-child(2n) { animation-delay: 45ms; }
-  .shop-cart-enter .shop-summary { animation-delay: 70ms; }
+  .shop-cart-enter .shop-summary { animation: shop-product-in var(--motion-panel) var(--motion-ease) backwards; }
+  .shop-cart-enter .shop-cart-item:nth-child(2n) { animation-delay: var(--motion-step); }
+  .shop-cart-enter .shop-summary { animation-delay: calc(var(--motion-step) * 2); }
 }
 @keyframes cart-arc { from { opacity: .25; transform: translate(16%, 12%) rotate(-12deg); } }
 
@@ -852,12 +852,12 @@ body:has(.shop-dialog[open]) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(featured-panel),
-  ::view-transition-old(featured-panel),
-  ::view-transition-new(featured-panel),
-  ::view-transition-group(featured-photo),
-  ::view-transition-old(featured-photo),
-  ::view-transition-new(featured-photo) { animation: none !important; }
+  ::view-transition-group(product-panel),
+  ::view-transition-old(product-panel),
+  ::view-transition-new(product-panel),
+  ::view-transition-group(product-photo),
+  ::view-transition-old(product-photo),
+  ::view-transition-new(product-photo) { animation: none !important; }
   .shop-card,
   .shop-dialog[open],
   .shop-dialog[open]::backdrop {

@@ -36,7 +36,7 @@ function mountGallery() {
           </button>`).join('')}
       </div>
       <div class="gallery-controls">
-        <div class="gallery-choices" role="group" aria-label="Elegir escena">
+        <div class="gallery-choices" data-motion-selection role="group" aria-label="Elegir escena">
           ${scenes.map(({ label }, index) => `<button type="button" data-gallery-select="${index}" aria-pressed="false">${label}</button>`).join('')}
         </div>
         <div class="gallery-arrows" role="group" aria-label="Recorrer escenas">

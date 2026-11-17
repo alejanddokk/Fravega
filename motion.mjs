@@ -1,10 +1,39 @@
 (function registerMotion() {
+function mountSelectionIndicator(group) {
+  const marker = document.createElement('span');
+  marker.className = 'motion-selection-marker';
+  marker.setAttribute('aria-hidden', 'true');
+  group.prepend(marker);
+
+  function syncSelection() {
+    const selected = group.querySelector('button[aria-pressed="true"]');
+    if (!selected) return;
+    marker.style.setProperty('--selection-x', `${selected.offsetLeft}px`);
+    marker.style.setProperty('--selection-y', `${selected.offsetTop}px`);
+    marker.style.setProperty('--selection-width', `${selected.offsetWidth}px`);
+    marker.style.setProperty('--selection-height', `${selected.offsetHeight}px`);
+    group.dataset.motionReady = '';
+  }
+
+  syncSelection();
+  const changes = new MutationObserver(syncSelection);
+  changes.observe(group, { attributes: true, attributeFilter: ['aria-pressed'], subtree: true });
+  if ('ResizeObserver' in window) {
+    const resize = new ResizeObserver(syncSelection);
+    resize.observe(group);
+    for (const button of group.querySelectorAll('button')) resize.observe(button);
+  } else {
+    window.addEventListener('resize', syncSelection, { passive: true });
+  }
+}
+
 function mountMotion() {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const precisePointer = matchMedia('(hover: hover) and (pointer: fine)');
   const hero = document.querySelector('[data-hero]');
   const targets = document.querySelectorAll('[data-reveal], [data-stagger]');
   const replay = hero.querySelector('[data-replay-hero]');
+  document.querySelectorAll('[data-motion-selection]').forEach(mountSelectionIndicator);
 
   function playHero() {
     if (hero.classList.contains('is-playing')) {
