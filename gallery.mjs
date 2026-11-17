@@ -43,6 +43,7 @@ function mountGallery() {
           <button type="button" data-gallery-step="-1" aria-label="Escena anterior">←</button>
           <button type="button" data-gallery-step="1" aria-label="Escena siguiente">→</button>
         </div>
+        <a class="gallery-catalog-link" href="#catalog" data-category="all">Ir al catálogo <span aria-hidden="true">↓</span></a>
       </div>
     </div>`;
 

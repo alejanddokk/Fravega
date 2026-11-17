@@ -2,6 +2,7 @@
   background: linear-gradient(#f0eaf5, var(--paper, #f8f7f4) 18rem);
   color: var(--ink, #171023);
   scroll-margin-top: 6rem;
+  overflow-x: clip;
 }
 
 .shop-wrap {
@@ -99,22 +100,39 @@
   gap: 1.1rem;
 }
 
+.shop-slot { display: grid; min-width: 0; }
+
 .shop-card {
   min-width: 0;
   overflow: hidden;
   border: 1px solid var(--line, #e5e0eb);
   border-radius: 1rem;
   background: #fff;
-  animation: shop-product-in .38s cubic-bezier(.2,.75,.25,1) backwards;
   transition: box-shadow .3s ease, border-color .3s ease;
 }
 
-.shop-card:nth-child(3n + 2) {
-  animation-delay: .04s;
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
+  @media (prefers-reduced-motion: no-preference) {
+    .shop-slot { view-timeline: --product-arrival block; }
+    .shop-slot:nth-child(3n + 1) { --arrival-x: -31%; --arrival-y: 16%; --arrival-angle: -13deg; }
+    .shop-slot:nth-child(3n + 2) { --arrival-x: 0%; --arrival-y: 30%; --arrival-angle: 5deg; }
+    .shop-slot:nth-child(3n) { --arrival-x: 31%; --arrival-y: 8%; --arrival-angle: 13deg; }
+    .shop-slot > .shop-card {
+      animation: shop-card-arrival auto cubic-bezier(.38,.04,.28,1) both;
+      animation-timeline: --product-arrival;
+      animation-range: entry 5% cover 44%;
+    }
+    .shop-slot:has(:focus-visible) > .shop-card { animation: none; }
+  }
+  @media (max-width: 820px) and (prefers-reduced-motion: no-preference) {
+    .shop-slot:nth-child(odd) { --arrival-x: -34%; --arrival-y: 27%; --arrival-angle: -11deg; }
+    .shop-slot:nth-child(even) { --arrival-x: 34%; --arrival-y: 10%; --arrival-angle: 11deg; }
+  }
 }
 
-.shop-card:nth-child(3n + 3) {
-  animation-delay: .08s;
+@keyframes shop-card-arrival {
+  from { transform: translate(var(--arrival-x), var(--arrival-y)) rotate(var(--arrival-angle)) scale(.76); }
+  to { transform: none; }
 }
 
 @keyframes shop-product-in {

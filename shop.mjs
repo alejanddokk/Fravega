@@ -66,7 +66,7 @@ function priceMarkup(product) {
 }
 
 function productCard(product) {
-  return `<article class="shop-card">
+  return `<div class="shop-slot" data-slot="${product.id}"><article class="shop-card">
     <button type="button" class="shop-card-picture" data-shop-action="product" data-product="${product.id}" aria-label="Ver ficha de ${product.name}">
       ${productImage(product)}
       ${product.previous ? `<span class="shop-discount">−${Math.round(100 * (1 - product.price / product.previous))}%</span>` : ''}
@@ -79,7 +79,7 @@ function productCard(product) {
         <button type="button" class="shop-add" data-shop-action="add" data-product="${product.id}" aria-label="Agregar ${product.name} al carrito"><span aria-hidden="true">+</span></button>
       </div>
     </div>
-  </article>`;
+  </article></div>`;
 }
 
 function purchaseSteps(current) {
@@ -134,6 +134,57 @@ function mountShop() {
   const grid = catalog.querySelector('.shop-grid');
   const results = catalog.querySelector('.shop-results');
   const filters = catalog.querySelector('.shop-filters');
+  const template = document.createElement('template');
+  template.innerHTML = products.map(productCard).join('');
+  const slots = new Map([...template.content.children].map(slot => [slot.dataset.slot, slot]));
+  const cardMoves = new Map();
+
+  function stopCardMoves() {
+    for (const animation of cardMoves.values()) animation.cancel();
+    cardMoves.clear();
+  }
+
+  function placeCards(matches) {
+    const before = new Map();
+    if (!reducedMotion.matches && typeof grid.animate === 'function') {
+      for (const slot of grid.querySelectorAll('.shop-slot')) {
+        before.set(slot, slot.getBoundingClientRect());
+      }
+    }
+    stopCardMoves();
+    const focused = grid.contains(document.activeElement) ? document.activeElement : null;
+    const ordered = matches.map(product => slots.get(product.id));
+    const keep = new Set(ordered);
+    for (const child of [...grid.children]) if (!keep.has(child)) child.remove();
+
+    ordered.forEach((slot, index) => {
+      const current = grid.children[index];
+      if (current !== slot) grid.insertBefore(slot, current ?? null);
+    });
+    if (focused && grid.contains(focused) && document.activeElement !== focused) {
+      focused.focus({ preventScroll: true });
+    }
+
+    // Measure the grid slots. Scroll motion runs on the cards inside them.
+    const distances = ordered.filter(slot => before.has(slot)).map(slot => {
+      const was = before.get(slot);
+      const now = slot.getBoundingClientRect();
+      return { slot, x: was.left - now.left, y: was.top - now.top };
+    });
+    for (const { slot, x, y } of distances) {
+      if (Math.abs(x) < 1 && Math.abs(y) < 1) continue;
+      const animation = slot.animate([
+        { transform: `translate(${x}px, ${y}px)` },
+        { transform: `translate(${x * .32}px, ${y * .32 - 20}px)`, offset: .6 },
+        { transform: 'none' },
+      ], { duration: 650, easing: 'cubic-bezier(.21,.72,.29,1)' });
+      cardMoves.set(slot, animation);
+      const settle = () => {
+        if (cardMoves.get(slot) === animation) cardMoves.delete(slot);
+      };
+      animation.finished.then(settle, settle);
+    }
+  }
 
   function renderCatalog() {
     const words = normalize(query).split(/\s+/).filter(Boolean);
@@ -151,7 +202,12 @@ function mountShop() {
     }
     const countText = matches.length === 1 ? '1 producto' : `${matches.length} productos`;
     results.textContent = query ? `${countText} para “${query}”` : countText;
-    grid.innerHTML = matches.length ? matches.map(productCard).join('') : `<div class="shop-empty">
+    if (matches.length) {
+      placeCards(matches);
+      return;
+    }
+    stopCardMoves();
+    grid.innerHTML = `<div class="shop-empty">
       <h3>No encontramos productos.</h3>
       <p>Probá otra búsqueda o volvé a ver todo el catálogo.</p>
       <button type="button" class="shop-secondary" data-shop-action="reset">Ver todo</button>
@@ -472,7 +528,10 @@ function mountShop() {
     dialogOrigin = null;
   });
   reducedMotion.addEventListener('change', () => {
-    if (reducedMotion.matches) featuredTransition?.skipTransition();
+    if (reducedMotion.matches) {
+      featuredTransition?.skipTransition();
+      stopCardMoves();
+    }
   });
   dialog.addEventListener('change', event => {
     const form = event.target.closest('[data-shop-form="checkout"]');
